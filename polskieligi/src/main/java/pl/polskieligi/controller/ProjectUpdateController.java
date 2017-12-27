@@ -24,7 +24,7 @@ public class ProjectUpdateController {
 
 	@RequestMapping("/updateProject")
 	public ModelAndView showUpdateInfo() {
-		List<ProjectUpdateJobRow> rows = new ArrayList<ProjectUpdateJobRow>();
+		List<ProjectImportJob> rows = new ArrayList<ProjectImportJob>();
 		for (String jobName : jobExplorer.getJobNames()) {
 
 			List<JobInstance> list = jobExplorer.findJobInstancesByJobName(jobName, 0, 20);
@@ -32,7 +32,7 @@ public class ProjectUpdateController {
 				List<JobExecution> jobExecutions = jobExplorer.getJobExecutions(jobInstance);
 				for (JobExecution jobExecution : jobExecutions) {
  
-					ProjectUpdateJobRow row = new ProjectUpdateJobRow();
+					ProjectImportJob row = new ProjectImportJob();
 					row.setJobExecution(jobExecution);
 					row.setProgress(getProgress(jobExecution));
 					Date endTime = jobExecution.getEndTime();
@@ -43,7 +43,7 @@ public class ProjectUpdateController {
 				}
 			}
 		}
-		Collections.sort(rows,(ProjectUpdateJobRow o1, ProjectUpdateJobRow o2) -> o1.getJobExecution().getId().intValue()-o2.getJobExecution().getId().intValue());
+		Collections.sort(rows,(ProjectImportJob o1, ProjectImportJob o2) -> o1.getJobExecution().getId().intValue()-o2.getJobExecution().getId().intValue());
 		
 		ModelAndView mv = new ModelAndView("updateProject", "rows", rows);
 		return mv;
@@ -63,29 +63,5 @@ public class ProjectUpdateController {
 			} 
 		} 
 		return result;
-	}
-
-	public class ProjectUpdateJobRow {
-		JobExecution jobExecution;
-		Long progress;
-		Long processingTime;
-		public JobExecution getJobExecution() {
-			return jobExecution;
-		}
-		public void setJobExecution(JobExecution jobExecution) {
-			this.jobExecution = jobExecution;
-		}
-		public Long getProgress() {
-			return progress;
-		}
-		public void setProgress(Long progress) {
-			this.progress = progress;
-		}
-		public Long getProcessingTime() {
-			return processingTime;
-		}
-		public void setProcessingTime(Long processingTime) {
-			this.processingTime = processingTime;
-		}
 	}
 }

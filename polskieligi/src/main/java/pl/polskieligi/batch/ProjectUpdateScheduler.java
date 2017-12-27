@@ -13,12 +13,15 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 public class ProjectUpdateScheduler {
 	@Autowired
+	@Qualifier("pojectUpdateJobLauncher")
 	private JobLauncher launcher;
-
+	
 	@Autowired
+	@Qualifier("projectUpdateJob")
 	private Job job;
 
 	private JobExecution execution;	

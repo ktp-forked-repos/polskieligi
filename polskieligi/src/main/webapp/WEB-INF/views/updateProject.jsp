@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"
 	pageEncoding="utf-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -27,6 +27,8 @@
 					<th><abbr title="End">End</abbr></th>
 					<th><abbr title="Status">Status</abbr></th>
 					<th><abbr title="End status">End status</abbr></th>
+					<th><abbr title="Job name">Job name</abbr></th>
+					<th><abbr title="Count">Count</abbr></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -42,6 +44,9 @@
 						<td><b>${row.jobExecution.endTime}</b></td>
 						<td><b>${row.jobExecution.status}</b></td>
 						<td><b>${row.jobExecution.exitStatus.exitCode}</b></td>
+						<td><b>${row.jobExecution.jobConfigurationName}</b></td>
+						<td><b>${row.jobExecution.stepExecutions[0].readCount}</b></td>
+
 					</tr>
 				</c:forEach>
 			</tbody>

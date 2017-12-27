@@ -25,11 +25,18 @@
 		<property name="databaseType" value="POSTGRES" />
 	</bean>
 
-	<bean id="jobLauncher"
+	<bean id="pojectUpdateJobLauncher"
 		class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 
+	<bean id="pojectImportJobLauncher"
+		class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="taskExecutor" ref="taskExecutor" />
+	</bean>
+
+	<bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
 
 	<job id="projectUpdateJob" xmlns="http://www.springframework.org/schema/batch"
 		restartable="true">
@@ -38,8 +45,18 @@
 		</listeners>
 		<step id="projectUpdateStep" allow-start-if-complete="true">
 			<tasklet transaction-manager="transactionManager">
-				<chunk reader="projectReader" processor="projectProcessor"
-					writer="projectWriter" commit-interval="1" />
+				<chunk reader="projectUpdateReader" processor="projectProcessor"
+					writer="emptyWriter" commit-interval="1" />
+			</tasklet>
+		</step>
+	</job>
+
+	<job id="projectImportJob" xmlns="http://www.springframework.org/schema/batch"
+		restartable="true">
+		<step id="projectImportStep" allow-start-if-complete="true">
+			<tasklet transaction-manager="transactionManager">
+				<chunk reader="projectImportReader" processor="projectProcessor"
+					writer="emptyWriter" commit-interval="1" />
 			</tasklet>
 		</step>
 	</job>
@@ -48,9 +65,11 @@
 
 	<bean id="projectProcessor" class="pl.polskieligi.batch.ProjectProcessor" />
 
-	<bean id="projectWriter" class="pl.polskieligi.batch.ProjectWriter" />
+	<bean id="emptyWriter" class="pl.polskieligi.batch.EmptyWriter" />
 
-	<bean id="projectReader"
+	<bean id="projectImportReader" class="pl.polskieligi.batch.ProjectImportReader" />
+
+	<bean id="projectUpdateReader"
 		class="org.springframework.batch.item.database.HibernateCursorItemReader">
 		<property name="sessionFactory" ref="sessionFactory" />
 		<property name="queryString">
@@ -59,7 +78,7 @@
 				assumes a placeholder, see - AbstractSqlPagingQueryProvider.init(...) - JdbcParameterUtils.countParameterPlaceholders(...) -->
 			<value>
                 <![CDATA[
-                    FROM Project
+                    SELECT minut_id FROM Project
                 ]]>
 			</value>
 		</property>
@@ -73,7 +92,7 @@
 		to be used are being specified -->
 	<task:scheduled-tasks>
 		<task:scheduled ref="projectUpdateScheduler" method="run"
-			cron="*/10 * * * * *" />
+			cron="*/30 * * * * *" />
 	</task:scheduled-tasks>
 
 	<bean id="jobExplorer"
