@@ -130,12 +130,12 @@ public class ImportProjectLogic {
 						report.append("<br/>" + leagueName + " - " + sezon);
 						League league = new League();
 						league.setName(leagueName);
-						Long leagueId = leagueDAO.saveUpdate(league);
+						leagueDAO.saveUpdate(league);
 						Season season = new Season();
 						season.setName(sezon);
-						Long seasonId = seasonDAO.saveUpdate(season);
-						leagueProject.setLeague_id(leagueId);
-						leagueProject.setSeason_id(seasonId);
+						seasonDAO.saveUpdate(season);
+						leagueProject.setLeague(league);
+						leagueProject.setSeason(season);
 						GregorianCalendar cal = new GregorianCalendar(year, 6,
 								1);
 						Date start_date = new Date(cal.getTimeInMillis());

@@ -41,8 +41,8 @@ public class ProjectDAOImpl extends AbstractDAOImpl<Project> implements ProjectD
 		Query query = session.createQuery(
 				"from Project where minut_id = :minut_id or (league_id = :league_id and season_id = :season_id)");
 		query.setParameter("minut_id", leagueProject.getMinut_id());
-		query.setParameter("league_id", leagueProject.getLeague_id());
-		query.setParameter("season_id", leagueProject.getSeason_id());
+		query.setParameter("league_id", leagueProject.getLeague().getId());
+		query.setParameter("season_id", leagueProject.getSeason().getId());
 		Project oldProject = null;
 		@SuppressWarnings("unchecked")
 		List<Project> leagues = query.list();
@@ -51,11 +51,11 @@ public class ProjectDAOImpl extends AbstractDAOImpl<Project> implements ProjectD
 			if (leagueProject.getMinut_id() > 0) {
 				oldProject.setMinut_id(leagueProject.getMinut_id());
 			}
-			if (leagueProject.getLeague_id() > 0) {
-				oldProject.setLeague_id(leagueProject.getLeague_id());
+			if (leagueProject.getLeague()!=null) {
+				oldProject.setLeague(leagueProject.getLeague());
 			}
-			if (leagueProject.getSeason_id() > 0) {
-				oldProject.setSeason_id(leagueProject.getSeason_id());
+			if (leagueProject.getSeason() !=null) {
+				oldProject.setSeason(leagueProject.getSeason());
 			}
 			if (leagueProject.getName() != null && !leagueProject.getName().isEmpty()) {
 				oldProject.setName(leagueProject.getName());

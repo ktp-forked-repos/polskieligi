@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Fb_Page {
@@ -13,11 +14,12 @@ public class Fb_Page {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	private BigInteger page_id;
-	private Integer team_id;
+	
+	@ManyToOne
+	private Team team;
 
 	public Fb_Page() {
 		page_id = new BigInteger("0");
-		team_id = 0;
 	}
 
 	public Long getId() {
@@ -36,11 +38,11 @@ public class Fb_Page {
 		this.id = id;
 	}
 
-	public Integer getTeam_id() {
-		return team_id;
+	public Team getTeam() {
+		return team;
 	}
 
-	public void setTeam_id(Integer team_id) {
-		this.team_id = team_id;
+	public void setTeam(Team team) {
+		this.team = team;
 	}	
 }

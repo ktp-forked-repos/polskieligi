@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Project {
@@ -17,8 +18,11 @@ public class Project {
 	private Long id;
 	private Integer minut_id;
 	private String name;
-	private Long league_id;
-	private Long season_id;
+	
+	@ManyToOne
+	private League league;
+	@ManyToOne
+	private Season season;
 	private Date start_date;
 	private Boolean published;
 	private Boolean archive;
@@ -27,8 +31,6 @@ public class Project {
 	public Project() {
 		minut_id = 0;
 		name = "";
-		league_id = Long.valueOf(0);
-		season_id = Long.valueOf(0);
 		start_date = new Date(0);
 		published = false;
 		archive = false;
@@ -75,20 +77,20 @@ public class Project {
 		this.name = name;
 	}
 
-	public Long getLeague_id() {
-		return league_id;
+	public League getLeague() {
+		return league;
 	}
 
-	public void setLeague_id(Long league_id) {
-		this.league_id = league_id;
+	public void setLeague(League league) {
+		this.league = league;
 	}
 
-	public Long getSeason_id() {
-		return season_id;
+	public Season getSeason() {
+		return season;
 	}
 
-	public void setSeason_id(Long season_id) {
-		this.season_id = season_id;
+	public void setSeason(Season season) {
+		this.season = season;
 	}
 
 	public Boolean getArchive() {
