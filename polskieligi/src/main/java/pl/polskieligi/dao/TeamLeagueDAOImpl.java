@@ -18,25 +18,21 @@ public class TeamLeagueDAOImpl  extends AbstractDAOImpl<TeamLeague> implements T
 	public TeamLeagueDAOImpl() {
 		super(TeamLeague.class);
 	}
-	public Long saveUpdate(TeamLeague teamLeague) {		
-		Long result = null;
+	public TeamLeague saveOrUpdate(TeamLeague teamLeague) {		
 		Session session = getCurrentSession();
 			Query query = session
 					.createQuery("from TeamLeague where project_id = :project_id AND team_id = :team_id");
-			query.setParameter("project_id", teamLeague.getProject_id());
-			query.setParameter("team_id", teamLeague.getTeam_id());
-			TeamLeague oldTeamLeague = null;
+			query.setParameter("project_id", teamLeague.getProject().getId());
+			query.setParameter("team_id", teamLeague.getTeam().getId());
 			@SuppressWarnings("unchecked")
 			List<TeamLeague> leagues = query.list();
 			for (TeamLeague tl : leagues) {
-				oldTeamLeague = tl;
-				result = tl.getId();
+				return tl;
 			}
-			if (oldTeamLeague == null) {
-				result = (Long) session.save(teamLeague);
-			}
+			session.save(teamLeague);
 			
-		return result;
+			
+		return teamLeague;
 	}
 
 	public void updateTeams(Long projectId,
@@ -53,10 +49,10 @@ public class TeamLeagueDAOImpl  extends AbstractDAOImpl<TeamLeague> implements T
 			List<TeamLeague> teamsToDelete = query.list();
 			for (TeamLeague tl : teamsToDelete) {							
 				query = session
-						.createQuery("from Match where project_id = :project_id AND (matchpart1 = :matchpart1 or matchpart2 = :matchpart2)");
+						.createQuery("from Match where project_id = :project_id AND (matchpart1_id = :matchpart1 or matchpart2_id = :matchpart2)");
 				query.setParameter("project_id", projectId);
-				query.setParameter("matchpart1", tl.getTeam_id());
-				query.setParameter("matchpart2", tl.getTeam_id());
+				query.setParameter("matchpart1", tl.getTeam().getId());
+				query.setParameter("matchpart2", tl.getTeam().getId());
 
 				@SuppressWarnings("unchecked")
 				List<Match> matchesToDelete = query.list();

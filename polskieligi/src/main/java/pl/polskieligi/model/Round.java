@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Round {
@@ -17,7 +18,8 @@ public class Round {
 	  private String name;
 	  private Date round_date_first;
 	  private Date round_date_last;
-	  private Long project_id;
+	  @ManyToOne
+	  private Project project;
 	  private Integer checked_out;
 	  private Timestamp checked_out_time;
 	  public Round(){
@@ -25,7 +27,6 @@ public class Round {
 		  name = "";
 		  round_date_first = new Date(0);
 		  round_date_last = new Date(0);
-		  project_id = Long.valueOf(0);
 		  checked_out = 0;
 		  checked_out_time = new Timestamp(0);
 	  }
@@ -60,11 +61,11 @@ public class Round {
 	public void setRound_date_last(Date round_date_last) {
 		this.round_date_last = round_date_last;
 	}
-	public Long getProject_id() {
-		return project_id;
+	public Project getProject() {
+		return project;
 	}
-	public void setProject_id(Long project_id) {
-		this.project_id = project_id;
+	public void setProject(Project project) {
+		this.project = project;
 	}
 	public Integer getChecked_out() {
 		return checked_out;

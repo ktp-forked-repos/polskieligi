@@ -6,14 +6,17 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class TeamLeague {
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private Long project_id;
-	private Long team_id;
+	@ManyToOne
+	private Project project;
+	@ManyToOne
+	private Team team;
 	private Integer division_id;
 	private Integer start_points;
 	private Integer admin;
@@ -25,8 +28,6 @@ public class TeamLeague {
 	private Integer standard_playground;
 
 	public TeamLeague() {
-		project_id = Long.valueOf(0);
-		team_id = Long.valueOf(0);
 		division_id = 0;
 		start_points = 0;
 		admin = 0;
@@ -118,19 +119,19 @@ public class TeamLeague {
 		this.id = id;
 	}
 
-	public Long getProject_id() {
-		return project_id;
+	public Project getProject() {
+		return project;
 	}
 
-	public void setProject_id(Long project_id) {
-		this.project_id = project_id;
+	public void setProject(Project project) {
+		this.project = project;
 	}
 
-	public Long getTeam_id() {
-		return team_id;
+	public Team getTeam() {
+		return team;
 	}
 
-	public void setTeam_id(Long team_id) {
-		this.team_id = team_id;
+	public void setTeam(Team team) {
+		this.team = team;
 	}
 }

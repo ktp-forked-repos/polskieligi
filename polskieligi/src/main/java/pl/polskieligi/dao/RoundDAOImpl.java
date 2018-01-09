@@ -17,11 +17,10 @@ public class RoundDAOImpl extends AbstractDAOImpl<Round> implements RoundDAO {
 		super(Round.class);
 	}
 
-	public Long saveUpdate(Round round) {
-		Long result = null;
+	public Round saveOrUpdate(Round round) {
 		Session session = getCurrentSession();
 		Query query = session.createQuery("from Round where project_id = :project_id and matchcode = :matchcode");
-		query.setParameter("project_id", round.getProject_id());
+		query.setParameter("project_id", round.getProject().getId());
 		query.setParameter("matchcode", round.getMatchcode());
 		Round oldRound = null;
 		@SuppressWarnings("unchecked")
@@ -39,12 +38,10 @@ public class RoundDAOImpl extends AbstractDAOImpl<Round> implements RoundDAO {
 			}
 
 			session.update(oldRound);
-			result = oldRound.getId();
+			return oldRound;
 		}
-		if (oldRound == null) {
-			result = (Long) session.save(round);
-		}
-
-		return result;
+		
+		session.save(round);
+		return round;
 	}
 }

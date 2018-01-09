@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import pl.polskieligi.model.Project;
-import pl.polskieligi.model.Team;
 
 @Repository
 @Transactional
@@ -35,14 +34,14 @@ public class ProjectDAOImpl extends AbstractDAOImpl<Project> implements ProjectD
 		return result;
 	}
 
-	public Long saveUpdate(Project leagueProject) {
-		Long result = null;
+	public Project saveOrUpdate(Project leagueProject) {
 		Session session = getCurrentSession();
 		Query query = session.createQuery(
-				"from Project where minut_id = :minut_id or (league_id = :league_id and season_id = :season_id)");
+				"from Project where minut_id = :minut_id or (league.id = :league_id and season.id = :season_id)");
 		query.setParameter("minut_id", leagueProject.getMinut_id());
 		query.setParameter("league_id", leagueProject.getLeague().getId());
 		query.setParameter("season_id", leagueProject.getSeason().getId());
+
 		Project oldProject = null;
 		@SuppressWarnings("unchecked")
 		List<Project> leagues = query.list();
@@ -51,10 +50,10 @@ public class ProjectDAOImpl extends AbstractDAOImpl<Project> implements ProjectD
 			if (leagueProject.getMinut_id() > 0) {
 				oldProject.setMinut_id(leagueProject.getMinut_id());
 			}
-			if (leagueProject.getLeague()!=null) {
+			if (leagueProject.getLeague() != null) {
 				oldProject.setLeague(leagueProject.getLeague());
 			}
-			if (leagueProject.getSeason() !=null) {
+			if (leagueProject.getSeason() != null) {
 				oldProject.setSeason(leagueProject.getSeason());
 			}
 			if (leagueProject.getName() != null && !leagueProject.getName().isEmpty()) {
@@ -69,13 +68,11 @@ public class ProjectDAOImpl extends AbstractDAOImpl<Project> implements ProjectD
 			}
 
 			session.update(oldProject);
-			result = oldProject.getId();
+			return oldProject;
 		}
-		if (oldProject == null) {
-			result = (Long) session.save(leagueProject);
-		}
+		session.save(leagueProject);
 
-		return result;
+		return leagueProject;
 	}
 
 	public Project getLastProjectForTeam(Integer teamId) {
@@ -97,7 +94,7 @@ public class ProjectDAOImpl extends AbstractDAOImpl<Project> implements ProjectD
 
 		return result;
 	}
-	
+
 	public Long getOpenProjectsCount() {
 		Session session = getCurrentSession();
 		return (Long) session.createCriteria(Project.class).setProjection(Projections.rowCount()).uniqueResult();

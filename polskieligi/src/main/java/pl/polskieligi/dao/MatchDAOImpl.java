@@ -17,7 +17,7 @@ public class MatchDAOImpl extends AbstractDAOImpl<Match> implements MatchDAO {
 	public MatchDAOImpl() {
 		super(Match.class);
 	}
-	public Long saveUpdate(Match obj) {
+	public Match saveOrUpdate(Match obj) {
 		return null;//TODO
 	}
 	
@@ -26,11 +26,11 @@ public class MatchDAOImpl extends AbstractDAOImpl<Match> implements MatchDAO {
 		Session session = getCurrentSession();
 			for (Match match : roundMatches) {
 				Query query = session
-						.createQuery("from Match where project_id = :project_id and round_id = :round_id and matchpart1 = :matchpart1 and matchpart2 = :matchpart2");
-				query.setParameter("project_id", match.getProject_id());
-				query.setParameter("round_id", match.getRound_id());
-				query.setParameter("matchpart1", match.getMatchpart1());
-				query.setParameter("matchpart2", match.getMatchpart2());
+						.createQuery("from Match where project_id = :project_id and round_id = :round_id and matchpart1_id = :matchpart1 and matchpart2_id = :matchpart2");
+				query.setParameter("project_id", match.getProject().getId());
+				query.setParameter("round_id", match.getRound().getId());
+				query.setParameter("matchpart1", match.getMatchpart1().getId());
+				query.setParameter("matchpart2", match.getMatchpart2().getId());
 				Match oldMatch = null;
 				@SuppressWarnings("unchecked")
 				List<Match> matches = query.list();

@@ -6,17 +6,20 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Match {
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long match_id;
 	private Integer match_number;
 	private Integer playground_id;
 	private Timestamp match_date;
-	private Long matchpart1;
-	private Long matchpart2;
+	@ManyToOne
+	private Team matchpart1;
+	@ManyToOne
+	private Team matchpart2;
 	private Float matchpart1_result;
 	private Float matchpart2_result;
 	private Integer matchpart1_bonus;
@@ -32,8 +35,10 @@ public class Match {
 	private Float matchpart1_result_decision;
 	private Float matchpart2_result_decision;
 	private String decision_info;
-	private Long project_id;
-	private Long round_id;
+	@ManyToOne
+	private Project project;
+	@ManyToOne
+	private Round round;
 	private Boolean count_result;
 	private Boolean published;
 	private Integer crowd;
@@ -52,8 +57,6 @@ public class Match {
 		match_number = 0;
 		playground_id = 0;
 		match_date = new Timestamp(0);
-		matchpart1 = Long.valueOf(0);
-		matchpart2 = Long.valueOf(0);
 		matchpart1_result = new Float(0);
 		matchpart2_result = new Float(0);
 		matchpart1_bonus = 0;
@@ -69,8 +72,6 @@ public class Match {
 		matchpart1_result_decision = new Float(0);
 		matchpart2_result_decision = new Float(0);
 		decision_info = "";
-		project_id = Long.valueOf(0);
-		round_id = Long.valueOf(0);
 		count_result = false;
 		published = false;
 		crowd = 0;
@@ -118,19 +119,19 @@ public class Match {
 		this.match_date = match_date;
 	}
 
-	public Long getMatchpart1() {
+	public Team getMatchpart1() {
 		return matchpart1;
 	}
 
-	public void setMatchpart1(Long matchpart1) {
+	public void setMatchpart1(Team matchpart1) {
 		this.matchpart1 = matchpart1;
 	}
 
-	public Long getMatchpart2() {
+	public Team getMatchpart2() {
 		return matchpart2;
 	}
 
-	public void setMatchpart2(Long matchpart2) {
+	public void setMatchpart2(Team matchpart2) {
 		this.matchpart2 = matchpart2;
 	}
 
@@ -254,20 +255,20 @@ public class Match {
 		this.decision_info = decision_info;
 	}
 
-	public Long getProject_id() {
-		return project_id;
+	public Project getProject() {
+		return project;
 	}
 
-	public void setProject_id(Long project_id) {
-		this.project_id = project_id;
+	public void setProject(Project project) {
+		this.project = project;
 	}
 
-	public Long getRound_id() {
-		return round_id;
+	public Round getRound() {
+		return round;
 	}
 
-	public void setRound_id(Long round_id) {
-		this.round_id = round_id;
+	public void setRound(Round round) {
+		this.round = round;
 	}
 
 	public Boolean getCount_result() {

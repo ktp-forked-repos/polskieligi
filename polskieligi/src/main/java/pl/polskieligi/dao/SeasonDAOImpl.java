@@ -16,22 +16,16 @@ public class SeasonDAOImpl extends AbstractDAOImpl<Season> implements SeasonDAO 
 		super(Season.class);
 	}
 
-	public Long saveUpdate(Season season) {
-		Long result = null;
+	public Season saveOrUpdate(Season season) {
 		Session session = getCurrentSession();
 		Query query = session.createQuery("from Season where name = :name");
 		query.setParameter("name", season.getName());
-		Season oldSeason = null;
 		@SuppressWarnings("unchecked")
 		List<Season> leagues = query.list();
 		for (Season s : leagues) {
-			oldSeason = s;
-			result = s.getId();
+			return s;
 		}
-		if (oldSeason == null) {
-			result = (Long) session.save(season);
-		}
-
-		return result;
+		session.save(season);
+		return season;
 	}
 }

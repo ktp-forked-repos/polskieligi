@@ -3,11 +3,13 @@ package pl.polskieligi.log;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -95,19 +97,18 @@ public class ImportProjectLogic {
 	public String doImport(Integer projectMinutId) {
 		java.util.Date startDate = new java.util.Date();
 		StringBuilder report = new StringBuilder();
-		Long projectId = null;
 		Integer year = null;
-		Map<String, Long> leagueTeams = new HashMap<String, Long>();
+		Map<String, Team> leagueTeams = new HashMap<String, Team>();
 		Session session = sessionFactory.openSession();
 		try {
 			int matches_count = 0;
 			int rounds_count = 0;
 			int teams_count = 0;
-			Project oldProject = projectDAO.retrieveProjectByMinut(projectMinutId);
-			if (oldProject != null
-					&& (oldProject.getArchive() && oldProject.getPublished() || oldProject
+			Project persProject = projectDAO.retrieveProjectByMinut(projectMinutId);
+			if (persProject != null
+					&& (persProject.getArchive() && persProject.getPublished() || persProject
 							.getType() == Project.OTHER)) {
-				report.append("<br/>Project id = " + oldProject.getId());
+				report.append("<br/>Project id = " + persProject.getId());
 				report.append("<br/>Project archive");
 			} else {
 				Document doc = Jsoup.connect(
@@ -130,10 +131,10 @@ public class ImportProjectLogic {
 						report.append("<br/>" + leagueName + " - " + sezon);
 						League league = new League();
 						league.setName(leagueName);
-						leagueDAO.saveUpdate(league);
+						league = leagueDAO.saveOrUpdate(league);
 						Season season = new Season();
 						season.setName(sezon);
-						seasonDAO.saveUpdate(season);
+						season = seasonDAO.saveOrUpdate(season);
 						leagueProject.setLeague(league);
 						leagueProject.setSeason(season);
 						GregorianCalendar cal = new GregorianCalendar(year, 6,
@@ -153,11 +154,13 @@ public class ImportProjectLogic {
 						}
 						leagueProject.setArchive(archive);
 					}
-					projectId = projectDAO.saveUpdate(leagueProject);
+					persProject = projectDAO.saveOrUpdate(leagueProject);
+
 				}
-				if (projectId == null) {
+				if (persProject == null) {
 					throw new IllegalStateException("projecId==null!!!");
 				}
+				
 				Elements druzyny = doc
 						.select("a[href~=/skarb.php\\?id_klub=*]");
 				for (Element druzyna : druzyny) {
@@ -171,25 +174,26 @@ public class ImportProjectLogic {
 					Team t = new Team();
 					t.setName(druzyna.text());
 					t.setMinut_id(Integer.parseInt(teamId));
-					Long t_id = teamDAO.saveUpdate(t);
-					leagueTeams.put(t.getName(), t_id);
+					t = teamDAO.saveOrUpdate(t);
+					leagueTeams.put(t.getName(), t);
 					TeamLeague tl = new TeamLeague();
-					tl.setProject_id(projectId);
-					tl.setTeam_id(t_id);
-					Long id = teamLeagueDAO.saveUpdate(tl);
-					if (id != null) {
+					tl.setProject(persProject);
+					tl.setTeam(t);
+					tl = teamLeagueDAO.saveOrUpdate(tl);
+					if (tl != null) {
 						teams_count++;
 					}
 				}
-				Project persProject = projectDAO.retrieveProjectByMinut(projectMinutId);
+				
 				if (leagueTeams.size() == 0) {
 					persProject.setType(Project.OTHER);
 				} else {
 					persProject.setType(Project.REGULAR_LEAGUE);
 				}
+				
 
 				if (leagueTeams.size() > 0) {
-					Long round_id = null;
+					Round round = null;
 					Integer round_matchcode = 0;
 					Elements kolejki = doc
 							.select("table[class=main][width=600][border=0][cellspacing=0][cellpadding][align=center]");
@@ -214,8 +218,8 @@ public class ImportProjectLogic {
 										String resultValue = result.get(0)
 												.text();
 										Match roundMatch = new Match();
-										roundMatch.setProject_id(projectId);
-										roundMatch.setRound_id(round_id);
+										roundMatch.setProject(persProject);
+										roundMatch.setRound(round);
 										roundMatch.setMatch_date(matchDate);
 										roundMatch.setMatchpart1(leagueTeams
 												.get(t1));
@@ -300,7 +304,7 @@ public class ImportProjectLogic {
 							if (nowaKolejka.size() == 1) {
 								String tmp = nowaKolejka.get(0).text();
 								round_matchcode++;
-								Round round = new Round();
+								round = new Round();
 								int i = tmp.indexOf("-");
 								String roundName = tmp;
 								if (i > 0 && tmp.length() - i > 2) {
@@ -317,9 +321,9 @@ public class ImportProjectLogic {
 								}
 								round.setName(roundName.trim());
 								round.setMatchcode(round_matchcode);
-								round.setProject_id(projectId);
-								round_id = roundDAO.saveUpdate(round);
-								if (round_id != null) {
+								round.setProject(persProject);
+								round = roundDAO.saveOrUpdate(round);
+								if (round != null) {
 									rounds_count++;
 								}
 							}
@@ -332,11 +336,16 @@ public class ImportProjectLogic {
 					} else {
 						report.append("<br/> Ilo�� dru�yn/mecz�w jest niepoprawna = ");
 					}
-					teamLeagueDAO.updateTeams(projectId,
-							leagueTeams.values());
+					
+					Collection<Long> teamIds = leagueTeams.values().stream().map(t -> {
+					    return t.getId();
+					}).collect(Collectors.toList());
+					
+					teamLeagueDAO.updateTeams(persProject.getId(),
+							teamIds);
 				}
-				projectDAO.saveUpdate(persProject);
-				report.append("<br/>Project id = " + projectId);
+				projectDAO.saveOrUpdate(persProject);
+				report.append("<br/>Project id = " + persProject.getId());
 				report.append("<br/> liczba dru�yn = " + teams_count);
 				report.append("<br/> liczba mecz�w = " + matches_count);
 				report.append("<br/> liczba kolejek = " + rounds_count);

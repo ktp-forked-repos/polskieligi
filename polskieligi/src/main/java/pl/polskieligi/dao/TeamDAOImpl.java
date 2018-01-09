@@ -18,8 +18,7 @@ public class TeamDAOImpl extends AbstractDAOImpl<Team> implements TeamDAO {
 		super(Team.class);
 	}
 
-	public Long saveUpdate(Team team) {
-		Long result = null;
+	public Team saveOrUpdate(Team team) {
 		Session session = getCurrentSession();
 		Query query = session.createQuery("from Team where minut_id = :minut_id");
 		query.setParameter("minut_id", team.getMinut_id());
@@ -32,12 +31,10 @@ public class TeamDAOImpl extends AbstractDAOImpl<Team> implements TeamDAO {
 				oldTeam.setName(team.getName());
 			}
 			session.update(oldTeam);
-			result = t.getId();
+			return oldTeam;
 		}
-		if (oldTeam == null) {
-			result = (Long) session.save(team);
-		}
-		return result;
+		session.save(team);
+		return team;
 
 	}
 
