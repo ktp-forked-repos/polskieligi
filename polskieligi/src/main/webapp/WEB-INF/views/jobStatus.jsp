@@ -29,6 +29,7 @@
 					<th><abbr title="End status">End status</abbr></th>
 					<th><abbr title="Job name">Job name</abbr></th>
 					<th><abbr title="Count">Count</abbr></th>
+					<th><abbr title="Parameters">Parameters</abbr></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -46,7 +47,7 @@
 						<td><b>${row.jobExecution.exitStatus.exitCode}</b></td>
 						<td><b>${row.jobExecution.jobInstance.jobName}</b></td>
 						<td><b>${row.jobExecution.stepExecutions[0].readCount}</b></td>
-
+						<td><b>${row.jobExecution.jobParameters}</b></td>												
 					</tr>
 				</c:forEach>
 			</tbody>
