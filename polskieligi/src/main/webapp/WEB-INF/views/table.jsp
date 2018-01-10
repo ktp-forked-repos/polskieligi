@@ -5,25 +5,6 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<%--  --%>
-<link rel="stylesheet"
-	href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
-<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-<jsp:include page="css/index.css" />
-<script>
-	$(function() {
-		$(document).tooltip();
-	});
-</script>
-<style type="text/css">
-.ui-tooltip {
-	border-radius: 6px;
-	font: 14px "Helvetica Neue", Sans-Serif;
-	box-shadow: 0 0 7px black;
-}
-</style>
-
 <title>Tabela</title>
 </head>
 <body>

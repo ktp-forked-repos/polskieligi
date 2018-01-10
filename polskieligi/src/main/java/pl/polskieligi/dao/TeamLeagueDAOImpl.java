@@ -69,7 +69,7 @@ public class TeamLeagueDAOImpl  extends AbstractDAOImpl<TeamLeague> implements T
 		List<Team> result = null;
 		Session session = getCurrentSession();
 
-			Query query = session.createQuery("from Team t where exists ( from TeamLeague tl where t.id = tl.team_id and tl.project_id = :project_id) order by t.name");
+			Query query = session.createQuery("from Team t where exists ( from TeamLeague tl where t.id = tl.team.id and tl.project.id = :project_id) order by t.name");
 			query.setParameter("project_id", projectId);
 			result = query.list();			
 			

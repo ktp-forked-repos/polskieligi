@@ -78,7 +78,7 @@
 				assumes a placeholder, see - AbstractSqlPagingQueryProvider.init(...) - JdbcParameterUtils.countParameterPlaceholders(...) -->
 			<value>
                 <![CDATA[
-                    SELECT minut_id FROM Project
+                    SELECT minut_id FROM Project where type = 1 and (archive = false or published = false)
                 ]]>
 			</value>
 		</property>

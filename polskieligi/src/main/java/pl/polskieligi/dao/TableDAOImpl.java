@@ -1,6 +1,5 @@
 package pl.polskieligi.dao;
 
-import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -35,37 +34,45 @@ public class TableDAOImpl implements TableDAO {
 	}
 
 	private static int NUMBER_OF_LAST_MATCHES = 10;
-	private final static String matchHomeQuery = "SELECT m.matchpart1, t.name, count( * ), "
-			+ "SUM(m.matchpart1_result) s1, " + "SUM(m.matchpart2_result) s2, "
-			+ "SUM(case when m.matchpart1_result > m.matchpart2_result then 1 else 0 end) s3, "
-			+ "SUM(case when m.matchpart1_result = m.matchpart2_result then 1 else 0 end) s4, "
-			+ "SUM(case when m.matchpart1_result < m.matchpart2_result then 1 else 0 end) s5 " 
-			+ "FROM match AS m "
-			+ "JOIN team AS t ON m.matchpart1 = t.id "
-			+ "WHERE m.project_id = :project_id and m.published = :published and m.count_result = :count_result and m.matchpart1 in (:team_ids) and m.matchpart2 in (:team_ids) GROUP BY m.matchpart1, t.name";
+	private final static String matchHomeQuery = "SELECT matchpart1.id, matchpart1.name, count( * ), "
+			+ "SUM(m.matchpart1_result), " + "SUM(m.matchpart2_result), "
+			+ "SUM(case when m.matchpart1_result > m.matchpart2_result then 1 else 0 end), "
+			+ "SUM(case when m.matchpart1_result = m.matchpart2_result then 1 else 0 end), "
+			+ "SUM(case when m.matchpart1_result < m.matchpart2_result then 1 else 0 end) " 
+			+ "FROM Match AS m "
+			+ "JOIN m.matchpart1 AS matchpart1 "
+			+ "JOIN m.matchpart2 AS matchpart2 "
+			+ "JOIN m.project AS project "
+			+ "WHERE project.id = :project_id and m.published = :published and m.count_result = :count_result and matchpart1.id in (:team_ids) and matchpart2.id in (:team_ids) GROUP BY matchpart1.id, matchpart1.name";
 
-	private final static String matchAwayQuery = "SELECT m.matchpart2, t.name, count( * ), "
-			+ "SUM(m.matchpart2_result) s1, " + "SUM(m.matchpart1_result) s2, "
-			+ "SUM(case when m.matchpart2_result > m.matchpart1_result then 1 else 0 end) s3, "
-			+ "SUM(case when m.matchpart2_result = m.matchpart1_result then 1 else 0 end) s4, "
-			+ "SUM(case when m.matchpart2_result < m.matchpart1_result then 1 else 0 end) s5 " + "FROM match AS m "
-			+ "JOIN team AS t ON m.matchpart2 = t.id "
-			+ "WHERE m.project_id = :project_id and m.published = :published and m.count_result = :count_result and m.matchpart1 in (:team_ids) and m.matchpart2 in (:team_ids) GROUP BY m.matchpart2, t.name";
+	private final static String matchAwayQuery = "SELECT matchpart2.id, matchpart2.name, count( * ), "
+			+ "SUM(m.matchpart2_result), " + "SUM(m.matchpart1_result), "
+			+ "SUM(case when m.matchpart2_result > m.matchpart1_result then 1 else 0 end), "
+			+ "SUM(case when m.matchpart2_result = m.matchpart1_result then 1 else 0 end), "
+			+ "SUM(case when m.matchpart2_result < m.matchpart1_result then 1 else 0 end) " 
+			+ "FROM Match AS m "
+			+ "JOIN m.matchpart1 AS matchpart1 "
+			+ "JOIN m.matchpart2 AS matchpart2 "
+			+ "JOIN m.project AS project "
+			+ "WHERE project.id = :project_id and m.published = :published and m.count_result = :count_result and matchpart1.id in (:team_ids) and matchpart2.id in (:team_ids) GROUP BY matchpart2.id, matchpart2.name";
 
-	private static final String lastMatchesQuery = "select m.match_date, m.matchpart1_result as result1, m.matchpart2_result as result2, t1.name as name1, t2.name as name2, m.matchpart1 "
-			+ "from match m join team t1 on t1.id = m.matchpart1 join team t2 on t2.id = m.matchpart2 "
-			+ "where m.project_id = :project_id and m.published = :published and ( m.matchpart1 = :matchpart1 or m.matchpart2 = :matchpart2 ) and m.count_result = :count_result order by m.match_date desc";
+	private static final String lastMatchesQuery = "select m.match_date, m.matchpart1_result as result1, m.matchpart2_result as result2, matchpart1.name as name1, matchpart2.name as name2, matchpart1.id "
+			+ "from Match m "
+			+ "JOIN m.matchpart1 AS matchpart1 "
+			+ "JOIN m.matchpart2 AS matchpart2 "
+			+ "JOIN m.project AS project "
+			+ "where project.id = :project_id and m.published = :published and ( matchpart1.id = :matchpart1 or matchpart2.id = :matchpart2 ) and m.count_result = :count_result order by m.match_date desc";
 
 	public List<TableRow> getTableRows(Long projectId) {
 		java.util.Date startDate = new java.util.Date();
 		List<TableRow> result = calculateTable(projectId);
 		java.util.Date date = new java.util.Date();
-		System.out.println("Point A1: " + (date.getTime() - startDate.getTime()));
+//		System.out.println("Point A1: " + (date.getTime() - startDate.getTime()));
 		for (TableRow row : result) {
 			row.setLastMatches(getLastMatches(projectId, row.getTeam_id()));
 		}
 		date = new java.util.Date();
-		System.out.println("Point A2: " + (date.getTime() - startDate.getTime()));
+//		System.out.println("Point A2: " + (date.getTime() - startDate.getTime()));
 		return result;
 	}
 
@@ -73,7 +80,7 @@ public class TableDAOImpl implements TableDAO {
 		java.util.Date startDate = new java.util.Date();
 		List<Team> allTeams = teamLeagueDAO.getTeams(projectId);
 		java.util.Date date = new java.util.Date();
-		System.out.println("Point B1: " + (date.getTime() - startDate.getTime()));
+//		System.out.println("Point B1: " + (date.getTime() - startDate.getTime()));
 		List<Long> allTeamsIds = new ArrayList<Long>();
 		for (Team t : allTeams) {
 			allTeamsIds.add(t.getId());
@@ -84,7 +91,7 @@ public class TableDAOImpl implements TableDAO {
 			tr1.setSequence(i++);
 		}
 		date = new java.util.Date();
-		System.out.println("Point B2: " + (date.getTime() - startDate.getTime()));
+//		System.out.println("Point B2: " + (date.getTime() - startDate.getTime()));
 		List<TableRow> result = new ArrayList<TableRow>();
 		Map<Long, TableRow> equalPoints = new HashMap<Long, TableRow>();
 		Integer points = Integer.MIN_VALUE;
@@ -109,7 +116,7 @@ public class TableDAOImpl implements TableDAO {
 			}
 		}
 		date = new java.util.Date();
-		System.out.println("Point B3: " + (date.getTime() - startDate.getTime()));
+//		System.out.println("Point B3: " + (date.getTime() - startDate.getTime()));
 		if (equalPoints.size() == 1) {
 			for (TableRow r : equalPoints.values()) {
 				result.add(r);
@@ -118,7 +125,7 @@ public class TableDAOImpl implements TableDAO {
 			result.addAll(sortEqualPoints(projectId, equalPoints));
 		}
 		date = new java.util.Date();
-		System.out.println("Point B4: " + (date.getTime() - startDate.getTime()));
+//		System.out.println("Point B4: " + (date.getTime() - startDate.getTime()));
 		return result;
 	}
 
@@ -169,7 +176,7 @@ public class TableDAOImpl implements TableDAO {
 			result.put(id, row);
 		}
 
-		Query query = session.createSQLQuery(matchHomeQuery);
+		Query query = session.createQuery(matchHomeQuery);
 		query.setParameter("project_id", projectId);
 		query.setParameter("published", true);
 		query.setParameter("count_result", true);
@@ -177,7 +184,7 @@ public class TableDAOImpl implements TableDAO {
 
 		List<Object[]> rows = query.list();
 		for (Object[] r : rows) {
-			Long teamId = ((BigInteger) r[0]).longValue();
+			Long teamId = (Long) r[0];
 			if (result.containsKey(teamId)) {
 				TableRow row = result.get(teamId);
 				addValues(row, r);
@@ -186,14 +193,14 @@ public class TableDAOImpl implements TableDAO {
 			}
 		}
 
-		query = session.createSQLQuery(matchAwayQuery);
+		query = session.createQuery(matchAwayQuery);
 		query.setParameter("project_id", projectId);
 		query.setParameter("published", true);
 		query.setParameter("count_result", true);
 		query.setParameterList("team_ids", teamIds);
 		rows = query.list();
 		for (Object[] r : rows) {
-			Long teamId = ((BigInteger) r[0]).longValue();
+			Long teamId = (Long) r[0];
 			if (result.containsKey(teamId)) {
 				TableRow row = result.get(teamId);
 				addValues(row, r);
@@ -210,7 +217,7 @@ public class TableDAOImpl implements TableDAO {
 	private TableRowMatch[] getLastMatches(Long project, Long teamId) {
 		TableRowMatch[] result = new TableRowMatch[NUMBER_OF_LAST_MATCHES];
 		Session session = getCurrentSession();
-		Query query = session.createSQLQuery(lastMatchesQuery);
+		Query query = session.createQuery(lastMatchesQuery);
 		query.setParameter("project_id", project);
 		query.setParameter("published", true);
 		query.setParameter("matchpart1", teamId);
@@ -227,7 +234,7 @@ public class TableDAOImpl implements TableDAO {
 			Float result2 = (Float) match[2];
 			String team1 = (String) match[3];
 			String team2 = (String) match[4];
-			Long team1Id = ((BigInteger) match[5]).longValue();
+			Long team1Id = (Long) match[5];
 			if (ts != null) {
 				m.setDate(new Date(ts.getTime()));
 			}
@@ -274,23 +281,23 @@ public class TableDAOImpl implements TableDAO {
 
 	private void addValues(TableRow row, Object[] r) {
 		row.setTeamName((String) r[1]);
-		row.setGames(((BigInteger) r[2]).intValue() + row.getGames());
-		row.setGoalsScored(((Float) r[3]).intValue() + row.getGoalsScored());
-		row.setGoalsAgainst(((Float) r[4]).intValue() + row.getGoalsAgainst());
-		row.setWins(((BigInteger) r[5]).intValue() + row.getWins());
-		row.setDraws(((BigInteger) r[6]).intValue() + row.getDraws());
-		row.setDefeats(((BigInteger) r[7]).intValue() + row.getDefeats());
+		row.setGames(((Long) r[2]).intValue() + row.getGames());
+		row.setGoalsScored(((Double) r[3]).intValue() + row.getGoalsScored());
+		row.setGoalsAgainst(((Double) r[4]).intValue() + row.getGoalsAgainst());
+		row.setWins(((Long) r[5]).intValue() + row.getWins());
+		row.setDraws(((Long) r[6]).intValue() + row.getDraws());
+		row.setDefeats(((Long) r[7]).intValue() + row.getDefeats());
 		row.setPoints(row.getWins() * 3 + row.getDraws());
 	}
 
 	private void addValuesHome(TableRow row, Object[] r) {
-		row.setGoalsScoredHome(((Float) r[3]).intValue() + row.getGoalsScoredHome());
-		row.setGoalsAgainstHome(((Float) r[4]).intValue() + row.getGoalsAgainstHome());
+		row.setGoalsScoredHome(((Double) r[3]).intValue() + row.getGoalsScoredHome());
+		row.setGoalsAgainstHome(((Double) r[4]).intValue() + row.getGoalsAgainstHome());
 	}
 
 	private void addValuesAway(TableRow row, Object[] r) {
-		row.setGoalsScoredAway(((Float) r[3]).intValue() + row.getGoalsScoredAway());
-		row.setGoalsAgainstAway(((Float) r[4]).intValue() + row.getGoalsAgainstAway());
+		row.setGoalsScoredAway(((Double) r[3]).intValue() + row.getGoalsScoredAway());
+		row.setGoalsAgainstAway(((Double) r[4]).intValue() + row.getGoalsAgainstAway());
 	}
 
 	private class TableRowComparator implements Comparator<TableRow> {

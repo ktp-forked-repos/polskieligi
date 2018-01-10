@@ -16,13 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-public class ProjectUpdateController {
-	String message = "Welcome to Spring MVC!";
+public class JobStatusController {
 
 	@Autowired
 	JobExplorer jobExplorer;
 
-	@RequestMapping("/updateProject")
+	@RequestMapping("/jobStatus")
 	public ModelAndView showUpdateInfo() {
 		List<ProjectImportJob> rows = new ArrayList<ProjectImportJob>();
 		for (String jobName : jobExplorer.getJobNames()) {
@@ -45,7 +44,7 @@ public class ProjectUpdateController {
 		}
 		Collections.sort(rows,(ProjectImportJob o1, ProjectImportJob o2) -> o1.getJobExecution().getId().intValue()-o2.getJobExecution().getId().intValue());
 		
-		ModelAndView mv = new ModelAndView("updateProject", "rows", rows);
+		ModelAndView mv = new ModelAndView("jobStatus", "rows", rows);
 		return mv;
 	}
 	
