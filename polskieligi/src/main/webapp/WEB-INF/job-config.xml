@@ -67,7 +67,10 @@
 
 	<bean id="emptyWriter" class="pl.polskieligi.batch.EmptyWriter" />
 
-	<bean id="projectImportReader" class="pl.polskieligi.batch.ProjectImportReader" />
+	<bean id="projectImportReader" class="pl.polskieligi.batch.ProjectImportReader" scope="step">
+		<property name="start" value="#{jobParameters['start']}"/>
+		<property name="end" value="#{jobParameters['end']}"/>
+	</bean>
 
 	<bean id="projectUpdateReader"
 		class="org.springframework.batch.item.database.HibernateCursorItemReader">
@@ -92,7 +95,8 @@
 		to be used are being specified -->
 	<task:scheduled-tasks>
 		<task:scheduled ref="projectUpdateScheduler" method="run"
-			cron="*/30 * * * * *" />
+			cron="0 0 23 * * ?" />
+<!-- 			"*/30 * * * * *" -->
 	</task:scheduled-tasks>
 
 	<bean id="jobExplorer"

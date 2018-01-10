@@ -94,7 +94,7 @@ public class ImportProjectLogic {
 	// System.out.println(getRoundEnd(2012, "30 listopada-1 grudnia"));
 	// }
 	@SuppressWarnings("deprecation")
-	public String doImport(Integer projectMinutId) {
+	public String doImport(Long projectMinutId) {
 		java.util.Date startDate = new java.util.Date();
 		StringBuilder report = new StringBuilder();
 		Integer year = null;
@@ -104,7 +104,7 @@ public class ImportProjectLogic {
 			int matches_count = 0;
 			int rounds_count = 0;
 			int teams_count = 0;
-			Project persProject = projectDAO.retrieveProjectByMinut(projectMinutId);
+			Project persProject = projectDAO.retrieveProjectByMinut(projectMinutId.intValue());
 			if (persProject != null
 					&& (persProject.getArchive() && persProject.getPublished() || persProject
 							.getType() == Project.OTHER)) {
@@ -119,7 +119,7 @@ public class ImportProjectLogic {
 				for (Element title : titles) {
 					String tmp = title.text();
 					Project leagueProject = new Project();
-					leagueProject.setMinut_id(projectMinutId);
+					leagueProject.setMinut_id(projectMinutId.intValue());
 					leagueProject.setName(tmp);
 					int index = tmp.indexOf("/");
 					if (index < 5 || tmp.length() < 12) {

@@ -19,8 +19,15 @@
 		<input
 			type="submit" value="Import project" />
 	</form>
+	
+	<form action="importProjectsBatch" method="GET">
+		Start: <input type="text" name="start" />
+		End: <input type="text" name="end" />  
+		<input
+			type="submit" value="Start import batch" />
+	</form>
+	
 	<a href="jobStatus">Job status</a>
-	<a href="importProjectsBatch">Start import batch</a>
 	
 </body>
 </html>

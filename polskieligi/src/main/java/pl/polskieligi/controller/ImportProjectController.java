@@ -15,7 +15,7 @@ public class ImportProjectController {
 	
 	@RequestMapping("/importProject")
 	public ModelAndView importProject(String projectId) {
-		String result = importProjectLogic.doImport(Integer.parseInt(projectId));
+		String result = importProjectLogic.doImport(Long.parseLong(projectId));
 		ModelAndView mv = new ModelAndView("importProject", "result", result);
 		return mv;		
 	}

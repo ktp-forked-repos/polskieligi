@@ -3,10 +3,14 @@ package pl.polskieligi.dao;
 import java.sql.Date;
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,7 +100,10 @@ public class ProjectDAOImpl extends AbstractDAOImpl<Project> implements ProjectD
 	}
 
 	public Long getOpenProjectsCount() {
-		Session session = getCurrentSession();
-		return (Long) session.createCriteria(Project.class).setProjection(Projections.rowCount()).uniqueResult();
+		Session session = getCurrentSession();		
+		Criteria cr = session.createCriteria(Project.class);
+		cr.add(Restrictions.eq("type", new Integer(1)));
+		cr.add(Restrictions.or(Restrictions.eq("archive", false), Restrictions.eq("published",false)));
+		return (Long) cr.setProjection(Projections.rowCount()).uniqueResult();
 	}
 }
